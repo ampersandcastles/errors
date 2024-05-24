@@ -5,6 +5,7 @@ use ssh2::Session;
 use csv::Writer;
 use serde::Serialize;
 use thiserror::Error;
+use serde_json::Value;
 
 #[derive(Error, Debug)]
 enum CustomError {
@@ -13,10 +14,14 @@ enum CustomError {
     
     #[error("IO Error")]
     IoError(#[from] io::Error),
+
+    #[error("JSON Error")]
+    JsonError(#[from] serde_json::Error),
 }
 
 #[derive(Serialize)]
 struct MachineError {
+    worker_name: String,
     ip: String,
     error: String,
 }
@@ -68,6 +73,26 @@ fn check_logs(session: &Session) -> Result<Vec<String>, CustomError> {
     Ok(logs)
 }
 
+fn get_worker_name(session: &Session) -> Result<String, CustomError> {
+    let mut channel = session.channel_session()?;
+    channel.exec("cat /config/cgminer.conf")?;
+    let mut s = String::new();
+    channel.read_to_string(&mut s)?;
+    channel.wait_close()?;
+    
+    let v: Value = serde_json::from_str(&s)?;
+    if let Some(pools) = v.get("pools").and_then(|p| p.as_array()) {
+        for pool in pools {
+            if let Some(user) = pool.get("user").and_then(|u| u.as_str()) {
+                if let Some(worker_id) = user.split('.').last() {
+                    return Ok(worker_id.to_string());
+                }
+            }
+        }
+    }
+    Err(CustomError::IoError(io::Error::new(io::ErrorKind::Other, "Worker name not found")))
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let ip_list = read_ip_list("ips.txt")?;
     let mut wtr = Writer::from_path("errors.csv")?;
@@ -77,7 +102,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         "ERROR_HASHRATE_TOO_LOW",
         "ERROR_NETWORK_DISCONNECTED",
         "ERROR_POWER_LOST: power voltage rise or drop",
-        "SWEEP_STRING"
+        "SWEEP_STRING",
+        "_pic_write_iic failed!",
+        "The dragons are here.",
         // Add more error patterns here
     ];
 
@@ -90,10 +117,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ];
 
         let mut error_found = String::new();
+        let mut worker_name = String::new();
 
         for (username, password) in &credentials {
             match ssh_connect(&ip, username, password) {
                 Ok(session) => {
+                    worker_name = match get_worker_name(&session) {
+                        Ok(name) => name,
+                        Err(e) => {
+                            println!("Failed to retrieve worker name from {}: {:?}", ip, e);
+                            continue;
+                        }
+                    };
+
                     match check_logs(&session) {
                         Ok(logs) => {
                             for log in logs {
@@ -122,7 +158,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         if !error_found.is_empty() {
-            wtr.serialize(MachineError { ip: ip.clone(), error: error_found })?;
+            wtr.serialize(MachineError {
+                worker_name: worker_name.clone(),
+                ip: ip.clone(),
+                error: error_found,
+            })?;
         }
     }
 
