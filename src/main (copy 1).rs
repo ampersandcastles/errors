@@ -53,14 +53,7 @@ fn list_log_files(session: &Session) -> Result<Vec<String>, CustomError> {
     Ok(s.lines().map(|line| line.to_string()).collect())
 }
 
-fn read_log_file(session: &Session, file: &str) -> Result<String, CustomError> {
-    // Skip known binary files
-    let skip_files = vec!["wtmp", "btmp", "lastlog"];
-    if skip_files.contains(&file) {
-        println!("Skipping non-UTF-8 log file: {}", file); // Informational message
-        return Err(CustomError::IoError(io::Error::new(io::ErrorKind::InvalidData, "stream did not contain valid UTF-8")));
-    }
-
+fn read_log_file(session: &Session, file: &str) -> Result<Option<String>, CustomError> {
     let mut channel = session.channel_session()?;
     channel.exec(&format!("cat /var/log/{}", file))?;
     let mut buffer = Vec::new();
@@ -68,40 +61,25 @@ fn read_log_file(session: &Session, file: &str) -> Result<String, CustomError> {
     channel.wait_close()?;
 
     match String::from_utf8(buffer) {
-        Ok(content) => Ok(content),
+        Ok(content) => Ok(Some(content)),
         Err(_) => {
-            println!("Skipping non-UTF-8 log file: {}", file); // Informational message
-            Err(CustomError::IoError(io::Error::new(io::ErrorKind::InvalidData, "stream did not contain valid UTF-8")))
-        },
+            println!("Skipping non-UTF-8 log file: {}", file); // Debugging line
+            Ok(None)
+        }
     }
 }
 
-fn check_logs(session: &Session, error_patterns: &[&str], asic_threshold: usize) -> Result<Vec<String>, CustomError> {
+fn check_logs(session: &Session) -> Result<Vec<String>, CustomError> {
     let log_files = list_log_files(session)?;
     let mut logs = Vec::new();
     for file in log_files {
         match read_log_file(session, &file) {
-            Ok(content) => logs.push(content),
+            Ok(Some(content)) => logs.push(content),
+            Ok(None) => (), // Skip non-UTF-8 files
             Err(e) => println!("Failed to read log file {}: {:?}", file, e), // Debugging line
         }
     }
-
-    // Check for predefined error patterns
-    let mut errors = Vec::new();
-    for log in &logs {
-        for pattern in error_patterns {
-            if log.contains(pattern) {
-                errors.push(format!("Error pattern '{}' found in file 'messages'", pattern));
-            }
-        }
-    }
-
-    // Check for ASIC chip counts
-    if let Some(asic_error) = check_asic_chips(&logs, asic_threshold) {
-        errors.push(asic_error);
-    }
-
-    Ok(errors)
+    Ok(logs)
 }
 
 fn get_worker_name(session: &Session) -> Result<String, CustomError> {
@@ -164,10 +142,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ("root", "root"), // Stock Antminer and Braiins
             ("miner", "miner"),
             ("admin", "admin"),
-            ("noro", "fuck pizza hut")
             // Add other credentials here
         ];
 
+        let mut error_found = String::new();
         let mut worker_name = String::new();
         let mut connected = false;
 
@@ -183,24 +161,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                     };
 
-                    match check_logs(&session, &error_patterns, asic_threshold) {
-                        Ok(errors) => {
-                            if errors.is_empty() {
-                                println!("No errors found on {}.", worker_name); // Debugging line
-                                wtr.serialize(MachineError {
-                                    worker_name: worker_name.clone(),
-                                    ip: ip.clone(),
-                                    error: "No errors found".to_string(),
-                                })?;
-                            } else {
-                                for error in errors {
-                                    println!("Error found on {}: {}", worker_name, error); // Debugging line
-                                    wtr.serialize(MachineError {
-                                        worker_name: worker_name.clone(),
-                                        ip: ip.clone(),
-                                        error,
-                                    })?;
+                    match check_logs(&session) {
+                        Ok(logs) => {
+                            // Check for predefined error patterns
+                            for log in &logs {
+                                for pattern in &error_patterns {
+                                    if log.contains(pattern) {
+                                        error_found = pattern.to_string();
+                                        println!("Error found on {}: {}", worker_name, error_found); // Debugging line
+                                        break;
+                                    }
                                 }
+                                if !error_found.is_empty() {
+                                    break;
+                                }
+                            }
+
+                            // Check for ASIC chip counts
+                            if let Some(asic_error) = check_asic_chips(&logs, asic_threshold) {
+                                error_found = asic_error;
+                                println!("Error found on {}: {}", worker_name, error_found); // Debugging line
+                            }
+
+                            if error_found.is_empty() {
+                                println!("No errors found on {}.", worker_name); // Debugging line
                             }
                         }
                         Err(e) => println!("Failed to retrieve logs from {}: {:?}", ip, e), // Debugging line
@@ -213,7 +197,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
 
-        if !connected {
+        if connected {
+            if !error_found.is_empty() {
+                wtr.serialize(MachineError {
+                    worker_name: worker_name.clone(),
+                    ip: ip.clone(),
+                    error: error_found,
+                })?;
+            } else {
+                wtr.serialize(MachineError {
+                    worker_name: worker_name.clone(),
+                    ip: ip.clone(),
+                    error: "No errors found".to_string(),
+                })?;
+            }
+        } else {
             println!("Could not connect to {} with any provided credentials.", ip); // Debugging line
         }
     }

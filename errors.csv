@@ -1,3 +1,3 @@
 worker_name,ip,error
-mw6663,10.0.60.181,ERROR_TEMP_TOO_HIGH
-mw9665,10.0.90.51,_pic_write_iic failed!
+mw1012,192.168.1.171,Error pattern 'ERROR_POWER_LOST: power voltage rise or drop' found in file 'messages'
+mw1012,192.168.1.171,Found only 0 ASIC chips on chain 0
