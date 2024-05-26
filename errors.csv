@@ -1,3 +1,0 @@
-worker_name,ip,error
-mw1012,192.168.1.171,Error pattern 'ERROR_POWER_LOST: power voltage rise or drop' found in file 'messages'
-mw1012,192.168.1.171,Found only 0 ASIC chips on chain 0

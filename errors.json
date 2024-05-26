@@ -1,0 +1,16 @@
+{
+    "error_keywords": {
+        "ERROR_TEMP_TOO_HIGH": "Temperature Error",
+        "ERROR_NETWORK_DISCONNECTED": "probably doesn't exist",
+        "ERROR_POWER_LOST: power voltage rise or drop": "voltage drop",
+        "_pic_write_iic failed!": "PIC Error",
+        "PLL read exceeded wait time": "PLL Error",
+        "ERROR_SOC_INIT: soc init failed": "SoC failure",
+        "fail to read 0:1": "eeprom",
+        "fail to write 0:1": "eeprom",
+        "bitmain_get_power_status failed": "PSU",
+        "power voltage can not meet the target": "PSU",
+        "reg crc error": "black hole",
+        "ERROR_POWER_LOST: pic check voltage drop": "voltage drop"
+    }
+}
