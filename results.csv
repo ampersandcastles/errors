@@ -1,0 +1,59 @@
+Worker ID,IP Address,Log File,Error Type,Error Message
+worker_name,ip,log_file,error_type,error_message
+mw9875,10.0.90.105,/var/log/miner.log,eeprom,fail to read 0:1
+mw9875,10.0.90.105,/var/log/messages,eeprom,fail to read 0:1
+mw9875,10.0.90.105,/var/log/messages.0,eeprom,fail to read 0:1
+mw6643,10.0.60.194,/var/log/miner.log,SoC failure,ERROR_SOC_INIT: soc init failed
+mw6643,10.0.60.194,/var/log/miner.log,ASIC Error,Chain 0: found 0 ASICs
+mw6643,10.0.60.194,/var/log/miner/miner.log,SoC failure,ERROR_SOC_INIT: soc init failed
+mw6643,10.0.60.194,/var/log/miner/miner.log,ASIC Error,Chain 0: found 0 ASICs
+mw6643,10.0.60.194,/var/log/miner/miner.log.0,SoC failure,ERROR_SOC_INIT: soc init failed
+mw6643,10.0.60.194,/var/log/miner/miner.log.0,ASIC Error,Chain 0: found 0 ASICs
+mw6643,10.0.60.194,/var/log/miner/miner.log.1,SoC failure,ERROR_SOC_INIT: soc init failed
+mw6643,10.0.60.194,/var/log/miner/miner.log.1,ASIC Error,Chain 0: found 0 ASICs
+mw6643,10.0.60.194,/var/log/messages,SoC failure,ERROR_SOC_INIT: soc init failed
+mw6643,10.0.60.194,/var/log/messages,ASIC Error,Chain 0: found 0 ASICs
+mw5513,10.0.50.164,/var/log/miner.log,SoC failure,ERROR_SOC_INIT: soc init failed
+mw5513,10.0.50.164,/var/log/miner.log,ASIC Error,Chain 1: found 0 ASICs
+mw5513,10.0.50.164,/var/log/messages,SoC failure,ERROR_SOC_INIT: soc init failed
+mw5513,10.0.50.164,/var/log/messages,ASIC Error,Chain 1: found 0 ASICs
+mw5423,10.0.50.28,/var/log/miner.log,ASIC Error,Chain 0: found 0 ASICs
+mw5423,10.0.50.28,/var/log/messages,ASIC Error,Chain 0: found 0 ASICs
+mw4365,10.0.40.189,/var/log/miner.log,voltage drop,ERROR_POWER_LOST: pic check voltage drop
+mw4365,10.0.40.189,/var/log/miner.log,PIC Error,_pic_write_iic failed!
+mw4365,10.0.40.189,/var/log/messages,voltage drop,ERROR_POWER_LOST: pic check voltage drop
+mw4365,10.0.40.189,/var/log/messages,PIC Error,_pic_write_iic failed!
+mw4184,10.0.40.244,/var/log/miner.log,SoC failure,ERROR_SOC_INIT: soc init failed
+mw4184,10.0.40.244,/var/log/miner.log,ASIC Error,Chain 0: found 96 ASICs
+mw4184,10.0.40.244,/var/log/messages,SoC failure,ERROR_SOC_INIT: soc init failed
+mw4184,10.0.40.244,/var/log/messages,ASIC Error,Chain 0: found 96 ASICs
+mw4122,10.0.40.203,/var/log/miner.log,SoC failure,ERROR_SOC_INIT: soc init failed
+mw4122,10.0.40.203,/var/log/miner.log,ASIC Error,Chain 2: found 0 ASICs
+mw4122,10.0.40.203,/var/log/messages,SoC failure,ERROR_SOC_INIT: soc init failed
+mw4122,10.0.40.203,/var/log/messages,ASIC Error,Chain 2: found 0 ASICs
+mw3514,10.0.30.178,/var/log/miner.log,SoC failure,ERROR_SOC_INIT: soc init failed
+mw3514,10.0.30.178,/var/log/miner.log,PSU,bitmain_get_power_status failed
+mw3514,10.0.30.178,/var/log/miner.log,PSU,power voltage can not meet the target
+mw3514,10.0.30.178,/var/log/messages,SoC failure,ERROR_SOC_INIT: soc init failed
+mw3514,10.0.30.178,/var/log/messages,PSU,bitmain_get_power_status failed
+mw3514,10.0.30.178,/var/log/messages,PSU,power voltage can not meet the target
+mw2564,10.0.20.163,/var/log/messages,SoC failure,ERROR_SOC_INIT: soc init failed
+mw2564,10.0.20.163,/var/log/messages,Temperature Error,ERROR_TEMP_TOO_HIGH
+mw2564,10.0.20.163,/var/log/messages,PIC Error,_pic_write_iic failed!
+mw2564,10.0.20.163,/var/log/messages,ASIC Error,Chain 0: found 0 ASICs
+mw2564,10.0.20.163,/var/log/messages,ASIC Error,Chain 1: found 0 ASICs
+mw2564,10.0.20.163,/var/log/messages,ASIC Error,Chain 2: found 0 ASICs
+mw2481,10.0.20.59,/var/log/messages,SoC failure,ERROR_SOC_INIT: soc init failed
+mw2184,10.0.20.210,/var/log/messages,ASIC Error,Chain 0: found 0 ASICs
+mw2144,10.0.20.131,/var/log/messages,SoC failure,ERROR_SOC_INIT: soc init failed
+mw2144,10.0.20.131,/var/log/messages,Temperature Error,ERROR_TEMP_TOO_HIGH
+mw2144,10.0.20.131,/var/log/messages,PIC Error,_pic_write_iic failed!
+mw2144,10.0.20.131,/var/log/messages,ASIC Error,Chain 0: found 0 ASICs
+mw2144,10.0.20.131,/var/log/messages,ASIC Error,Chain 1: found 0 ASICs
+mw2144,10.0.20.131,/var/log/messages,ASIC Error,Chain 2: found 0 ASICs
+mw1132,10.0.10.169,/var/log/miner.log,SoC failure,ERROR_SOC_INIT: soc init failed
+mw1132,10.0.10.169,/var/log/messages,SoC failure,ERROR_SOC_INIT: soc init failed
+mwxxx2,10.0.100.54,/var/log/miner.log,ASIC Error,Chain 1: found 0 ASICs
+mwxxx2,10.0.100.54,/var/log/miner.log,ASIC Error,Chain 2: found 0 ASICs
+mwxxx2,10.0.100.54,/var/log/messages,ASIC Error,Chain 1: found 0 ASICs
+mwxxx2,10.0.100.54,/var/log/messages,ASIC Error,Chain 2: found 0 ASICs
